@@ -18,7 +18,7 @@ import { generateDemoName } from "./utils/generate-demo-name";
 config();
 
 export const auth = betterAuth({
-  baseURL: process.env.KANEO_API_URL || "http://kaneo-frontend:1337" || "https://tasks-api.facta.dietrichconsultoria.com.br/",
+  baseURL: process.env.KANEO_API_URL || "http://kaneo-frontend:1337" || "https://tasks-api.facta.dietrichconsultoria.com.br/" ,
   trustedOrigins: [process.env.KANEO_CLIENT_URL || "http://localhost:5173" || "https://tasks.facta.dietrichconsultoria.com.br/"],
   secret: process.env.AUTH_SECRET || "",
   database: drizzleAdapter(db, {
