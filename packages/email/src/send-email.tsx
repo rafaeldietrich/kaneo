@@ -34,21 +34,16 @@ const transporter = nodemailer.createTransport({
   debug: true,  // Habilitar debug
 });
 
-// ===================================
-// Verificar conexão ao iniciar
-// ===================================
+
+
+// Verificar conexão
 transporter.verify((error, success) => {
   if (error) {
-    console.error("[SMTP] ❌ Erro na verificação de conexão:", error);
+    console.error("[SMTP] ❌ Erro na verificação:", error);
   } else {
     console.log("[SMTP] ✅ Conexão verificada com sucesso!");
   }
 });
-
-
-// ===================================
-// Enviar Magic Link Email
-// ===================================
 
 export const sendMagicLinkEmail = async (
   to: string,
@@ -61,14 +56,12 @@ export const sendMagicLinkEmail = async (
     const emailTemplate = await render(MagicLinkEmail(data));
     console.log("[MAGIC LINK] ✅ Template renderizado");
 
-    // CORREÇÃO CRÍTICA: Usar UTF-8 sem encoding quoted-printable
     const mailData = {
-      from: `"${process.env.SMTP_FROM_NAME || "Dietrich Consultoria"}" <${process.env.SMTP_FROM}>`,
-      to: to.toLowerCase(), // Força lowercase
-      replyTo: process.env.SMTP_FROM, // HostGator requer Reply-To
+      from: `"${process.env.SMTP_FROM_NAME || "Kaneo"}" <${process.env.SMTP_FROM}>`,
+      to: to.toLowerCase(),
+      replyTo: process.env.SMTP_FROM,
       subject,
       html: emailTemplate,
-      textEncoding: "utf-8", // IMPORTANTE: UTF-8 direto, não quoted-printable
       
       // Headers críticos para HostGator
       headers: {
@@ -80,7 +73,7 @@ export const sendMagicLinkEmail = async (
         "List-Unsubscribe": `<${process.env.FRONTEND_URL}/unsubscribe>`,
         "MIME-Version": "1.0",
       },
-    };
+    } as Parameters<typeof transporter.sendMail>;
 
     console.log("[MAGIC LINK] Enviando via SMTP...");
     const info = await transporter.sendMail(mailData);
@@ -98,6 +91,8 @@ export const sendMagicLinkEmail = async (
     throw new Error(`Falha ao enviar email: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
+
+
 // ===================================
 // Enviar Workspace Invitation Email
 // ===================================
