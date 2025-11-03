@@ -63,6 +63,8 @@ export const sendMagicLinkEmail = async (
       replyTo: process.env.SMTP_FROM || "",
       subject,
       html: emailTemplate,
+      // CRÍTICO: Forçar Base64 ao invés de quoted-printable
+      encoding: "base64",      
       headers: {
         "X-Mailer": "Kaneo/2.0",
         "X-Priority": "3 (Normal)",
