@@ -8,6 +8,16 @@ import WorkspaceInvitationEmail, {
 } from "./templates/workspace-invitation";
 
 config();
+// ===================================
+// DEBUG: Validar variáveis no startup
+// ===================================
+console.log("[SMTP Config] Validando variáveis de ambiente...");
+console.log(`[SMTP] HOST: ${process.env.SMTP_HOST}`);
+console.log(`[SMTP] PORT: ${process.env.SMTP_PORT}`);
+console.log(`[SMTP] USER: ${process.env.SMTP_USER}`);
+console.log(`[SMTP] SECURE: ${process.env.SMTP_SECURE}`);
+console.log(`[SMTP] FROM: ${process.env.SMTP_FROM}`);
+console.log(`[SMTP] FROM_NAME: ${process.env.SMTP_FROM_NAME}`);
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -17,6 +27,11 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
+  logger: true, // Habilitar logging
+  debug: true,  // Habilitar debug
 });
 
 export const sendMagicLinkEmail = async (
@@ -32,7 +47,6 @@ export const sendMagicLinkEmail = async (
       subject,
       html: emailTemplate,
     });
-    console.log(`Infomações de email "${process.env.SMTP_HOST}", secure "${process.env.SMTP_SECURE}" e port "${process.env.SMTP_PORT}", user "${process.env.SMTP_USER}"`);
   } catch (error) {
     console.error("Error sending magic link email", error);
   }
