@@ -45,6 +45,7 @@ transporter.verify((error, success) => {
     console.log("[SMTP] ✅ Conexão verificada com sucesso!");
   }
 });
+console.log(`Infomações de email "${process.env.SMTP_HOST}", secure "${process.env.SMTP_SECURE}" e port "${process.env.SMTP_PORT}", user "${process.env.SMTP_USER}"`);
 
 export const sendMagicLinkEmail = async (
   to: string,
