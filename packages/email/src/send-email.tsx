@@ -96,6 +96,11 @@ export const sendMagicLinkEmail = async (
 };
 
 
+
+<<<<<<< HEAD
+=======
+
+>>>>>>> c292da79d736a108f4658f6cb9ad29197a99945e
 // ===================================
 // Enviar Workspace Invitation Email
 // ===================================
