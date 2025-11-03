@@ -56,28 +56,22 @@ export const sendMagicLinkEmail = async (
     const emailTemplate = await render(MagicLinkEmail(data));
     console.log("[MAGIC LINK] ✅ Template renderizado");
 
-    const mailData = {
+    console.log("[MAGIC LINK] Enviando via SMTP...");
+    const info = await transporter.sendMail({
       from: `"${process.env.SMTP_FROM_NAME || "Kaneo"}" <${process.env.SMTP_FROM}>`,
       to: to.toLowerCase(),
-      replyTo: process.env.SMTP_FROM,
+      replyTo: process.env.SMTP_FROM || "",
       subject,
       // text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
       html: emailTemplate,
-      
-      // Headers críticos para HostGator
       headers: {
         "X-Mailer": "Kaneo/2.0",
         "X-Priority": "3 (Normal)",
         "Importance": "Normal",
         "X-MSMail-Priority": "Normal",
         "Precedence": "bulk",
-        "List-Unsubscribe": `<${process.env.FRONTEND_URL}/unsubscribe>`,
-        "MIME-Version": "1.0",
       },
-    } as Parameters<typeof transporter.sendMail>;
-
-    console.log("[MAGIC LINK] Enviando via SMTP...");
-    const info = await transporter.sendMail(mailData);
+    });
 
     console.log(`\n✅ [MAGIC LINK] EMAIL ENVIADO COM SUCESSO!`);
     console.log(`[MAGIC LINK] Message ID: ${info.messageId}`);
