@@ -64,6 +64,8 @@ export const sendMagicLinkEmail = async (
       subject,
       // text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
       html: emailTemplate,
+      // CRÍTICO: Forçar Base64 ao invés de quoted-printable
+      encoding: "base64",      
       headers: {
         "X-Mailer": "Kaneo/2.0",
         "X-Priority": "3 (Normal)",
