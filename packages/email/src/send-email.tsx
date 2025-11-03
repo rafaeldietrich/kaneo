@@ -90,7 +90,6 @@ export const sendMagicLinkEmail = async (
   }
 };
 
-
 // ===================================
 // Enviar Workspace Invitation Email
 // ===================================
