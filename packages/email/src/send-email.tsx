@@ -45,7 +45,6 @@ transporter.verify((error, success) => {
     console.log("[SMTP] ✅ Conexão verificada com sucesso!");
   }
 });
-console.log(`Infomações de email "${process.env.SMTP_HOST}", secure "${process.env.SMTP_SECURE}" e port "${process.env.SMTP_PORT}", user "${process.env.SMTP_USER}"`);
 
 export const sendMagicLinkEmail = async (
   to: string,
@@ -76,6 +75,7 @@ export const sendMagicLinkEmail = async (
         "Precedence": "bulk",
       },
     });
+<<<<<<< HEAD
 
     console.log(`\n✅ [MAGIC LINK] EMAIL ENVIADO COM SUCESSO!`);
     console.log(`[MAGIC LINK] Message ID: ${info.messageId}`);
@@ -83,6 +83,9 @@ export const sendMagicLinkEmail = async (
     console.log(`[MAGIC LINK] Para: ${to}\n`);
 
     return info;
+=======
+    console.log(`Infomações de email "${process.env.SMTP_HOST}", secure "${process.env.SMTP_SECURE}" e port "${process.env.SMTP_PORT}", user "${process.env.SMTP_USER}"`);
+>>>>>>> b64a276 (a)
   } catch (error) {
     console.error(`\n❌ [MAGIC LINK] ERRO AO ENVIAR EMAIL`);
     console.error(`[MAGIC LINK] Para: ${to}`);
