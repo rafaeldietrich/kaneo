@@ -3,7 +3,7 @@
 import type { AppType } from "@kaneo/api";
 import { hc } from "hono/client";
 
-const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:1337" || "https://tasks.facta.dietrichconsultoria.com.br/";
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:1337" || "https://tasks-api.facta.dietrichconsultoria.com.br/api";
 const apiUrl = baseUrl.endsWith("/api") ? baseUrl : `${baseUrl}/api`;
 
 export const client = hc<AppType>(apiUrl, {
