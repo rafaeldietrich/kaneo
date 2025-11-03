@@ -63,13 +63,26 @@ export const sendMagicLinkEmail = async (
     const emailTemplate = await render(MagicLinkEmail(data));
     console.log("[MAGIC LINK] ✅ Template renderizado");
 
-    // Preparar dados do email
+   // CORREÇÃO CRÍTICA: Usar UTF-8 sem encoding quoted-printable
     const mailData = {
-      from: process.env.SMTP_FROM,
-      to,
+      from: `"${process.env.SMTP_FROM_NAME || "Dietrich Consultoria"}" <${process.env.SMTP_FROM}>`,
+      to: to.toLowerCase(), // Força lowercase
+      replyTo: process.env.SMTP_FROM, // HostGator requer Reply-To
       subject,
       // text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
       html: emailTemplate,
+      textEncoding: "utf-8", // IMPORTANTE: UTF-8 direto, não quoted-printable
+      
+      // Headers críticos para HostGator
+      headers: {
+        "X-Mailer": "Kaneo/2.0",
+        "X-Priority": "3 (Normal)",
+        "Importance": "Normal",
+        "X-MSMail-Priority": "Normal",
+        "Precedence": "bulk",
+        "List-Unsubscribe": `<${process.env.FRONTEND_URL}/unsubscribe>`,
+        "MIME-Version": "1.0",
+      },
     };
 
     console.log("[MAGIC LINK] Enviando email via SMTP...");
@@ -95,56 +108,20 @@ export const sendMagicLinkEmail = async (
     throw new Error(`Falha ao enviar email: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
-
 // ===================================
 // Enviar Workspace Invitation Email
 // ===================================
 
-// ===================================
-// Enviar Workspace Invitation Email
-// ===================================
 export const sendWorkspaceInvitationEmail = async (
   to: string,
   subject: string,
   data: WorkspaceInvitationEmailProps,
 ) => {
-  console.log(`\n[INVITATION] Iniciando envio de convite para: ${to}`);
-  console.log(`[INVITATION] Assunto: ${subject}`);
-  
-  try {
-    // Renderizar template
-    console.log("[INVITATION] Renderizando template...");
-    const emailTemplate = await render(WorkspaceInvitationEmail({ ...data, to }));
-    console.log("[INVITATION] ✅ Template renderizado");
-
-    // Preparar dados do email
-    const mailData = {
-      from: process.env.SMTP_FROM,
-      to,
-      subject,
-      html: emailTemplate,
-    };
-
-    console.log("[INVITATION] Enviando email via SMTP...");
-    console.log(`[INVITATION] De: ${mailData.from}`);
-    console.log(`[INVITATION] Para: ${mailData.to}`);
-
-    // Enviar email
-    const info = await transporter.sendMail(mailData);
-
-    // LOG DE SUCESSO (DEPOIS do envio)
-    console.log(`\n✅ [INVITATION] EMAIL ENVIADO COM SUCESSO!`);
-    console.log(`[INVITATION] Message ID: ${info.messageId}`);
-    console.log(`[INVITATION] Response: ${info.response}`);
-    console.log(`[INVITATION] Para: ${to}\n`);
-
-    return info;
-  } catch (error) {
-    console.error(`\n❌ [INVITATION] ERRO AO ENVIAR EMAIL`);
-    console.error(`[INVITATION] Para: ${to}`);
-    console.error(`[INVITATION] Erro:`, error);
-    
-    // Re-lançar erro para Better Auth capturar
-    throw new Error(`Falha ao enviar email de convite: ${error instanceof Error ? error.message : String(error)}`);
-  }
+  const emailTemplate = await render(WorkspaceInvitationEmail({ ...data, to }));
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to,
+    subject,
+    html: emailTemplate,
+  });
 };
