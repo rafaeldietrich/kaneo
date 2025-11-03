@@ -62,8 +62,13 @@ export const sendMagicLinkEmail = async (
       to: to.toLowerCase(),
       replyTo: process.env.SMTP_FROM || "",
       subject,
+<<<<<<< HEAD
       // text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
       html: emailTemplate,
+=======
+      text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
+      // html: emailTemplate,
+>>>>>>> d3d5d16 (text)
       // CRÍTICO: Forçar Base64 ao invés de quoted-printable
       encoding: "base64",      
       headers: {
