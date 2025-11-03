@@ -30,7 +30,7 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
-  name: 'DietrichConsultoria',
+  name: 'DietrichConsultoria', // essesncial para Hostgator funcionar default é localhost e aqui nao funciona!
   logger: true, // Habilitar logging
   debug: true,  // Habilitar debug
 });
