@@ -30,7 +30,7 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
-  name: 'DietrichConsultoria',
+  name: 'DietrichConsultoria', // essesncial para Hostgator funcionar default é localhost e aqui nao funciona!
   logger: true, // Habilitar logging
   debug: true,  // Habilitar debug
 });
@@ -63,8 +63,8 @@ export const sendMagicLinkEmail = async (
       to: to.toLowerCase(),
       replyTo: process.env.SMTP_FROM || "",
       subject,
-      text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
-      // html: emailTemplate,
+      // text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
+      html: emailTemplate,
       // CRÍTICO: Forçar Base64 ao invés de quoted-printable
       encoding: "base64",      
       headers: {
