@@ -8,21 +8,52 @@ import WorkspaceInvitationEmail, {
 } from "./templates/workspace-invitation";
 
 config();
+
 // ===================================
-// DEBUG: Validar variáveis no startup
+// DEBUG CONDICIONAL
 // ===================================
-console.log("[SMTP Config] Validando variáveis de ambiente...");
-console.log(`[SMTP] HOST: ${process.env.SMTP_HOST}`);
-console.log(`[SMTP] PORT: ${process.env.SMTP_PORT}`);
-console.log(`[SMTP] USER: ${process.env.SMTP_USER}`);
-console.log(`[SMTP] SECURE: ${process.env.SMTP_SECURE}`);
-console.log(`[SMTP] FROM: ${process.env.SMTP_FROM}`);
-console.log(`[SMTP] FROM_NAME: ${process.env.SMTP_FROM_NAME}`);
+export const debugEmail = process.env.DEBUG_EMAIL === "true";
+
+const log = (message: string, data?: unknown) => {
+  if (debugEmail) {
+    if (data) {
+      console.log(`[EMAIL DEBUG] ${message}`, data);
+    } else {
+      console.log(`[EMAIL DEBUG] ${message}`);
+    }
+  }
+};
+
+const logError = (message: string, error?: unknown) => {
+  if (debugEmail) {
+    if (error) {
+      console.error(`[EMAIL ERROR] ${message}`, error);
+    } else {
+      console.error(`[EMAIL ERROR] ${message}`);
+    }
+  }
+};
+
+const logSuccess = (message: string, data?: unknown) => {
+  if (debugEmail) {
+    if (data) {
+      console.log(`[EMAIL SUCCESS] ${message}`, data);
+    } else {
+      console.log(`[EMAIL SUCCESS] ${message}`);
+    }
+  }
+};
+
+// ===================================
+// TRANSPORTER SETUP
+// ===================================
+log("Inicializando transporter com SMTP...");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  secure: process.env.SMTP_SECURE !== "false",
   port: Number(process.env.SMTP_PORT),
+  secure: process.env.SMTP_PORT === "465",
+  name: process.env.SMTP_HOST, // ✅ CRÍTICO: Evita 'localhost'
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
@@ -30,48 +61,43 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
-  name: 'DietrichConsultoria', // essesncial para Hostgator funcionar default é localhost e aqui nao funciona!
-  logger: true, // Habilitar logging
-  debug: true,  // Habilitar debug
+  logger: debugEmail, // ✅ Habilita logs nodemailer só se DEBUG ativo
+  debug: debugEmail,  // ✅ Habilita debug nodemailer só se DEBUG ativo
 });
 
-
-
-// Verificar conexão
+// ===================================
+// VERIFICAR CONEXÃO
+// ===================================
 transporter.verify((error, success) => {
   if (error) {
-    console.error("[SMTP] ❌ Erro na verificação:", error);
+    logError("Erro na verificação de conexão SMTP:", error);
   } else {
-    console.log("[SMTP] ✅ Conexão verificada com sucesso!");
+    logSuccess("Conexão SMTP verificada com sucesso!");
   }
 });
 
+// ===================================
+// ENVIAR MAGIC LINK EMAIL
+// ===================================
 export const sendMagicLinkEmail = async (
   to: string,
   subject: string,
   data: MagicLinkEmailProps,
 ) => {
-  console.log(`\n[MAGIC LINK] Iniciando envio para: ${to}`);
+  log(`Iniciando envio de magic link para: ${to}`);
   
   try {
     const emailTemplate = await render(MagicLinkEmail(data));
-    console.log("[MAGIC LINK] ✅ Template renderizado");
+    log("✅ Template renderizado");
 
-    console.log("[MAGIC LINK] Enviando via SMTP...");
-    const info = await transporter.sendMail({
+    log("Preparando dados do email...");
+    const mailData = {
       from: `"${process.env.SMTP_FROM_NAME || "Kaneo"}" <${process.env.SMTP_FROM}>`,
       to: to.toLowerCase(),
       replyTo: process.env.SMTP_FROM || "",
       subject,
-<<<<<<< HEAD
-      // text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
       html: emailTemplate,
-=======
-      text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
-      // html: emailTemplate,
->>>>>>> d3d5d16 (text)
-      // CRÍTICO: Forçar Base64 ao invés de quoted-printable
-      encoding: "base64",      
+      encoding: "base64", // ✅ HostGator requer base64
       headers: {
         "X-Mailer": "Kaneo/2.0",
         "X-Priority": "3 (Normal)",
@@ -79,42 +105,87 @@ export const sendMagicLinkEmail = async (
         "X-MSMail-Priority": "Normal",
         "Precedence": "bulk",
       },
+    };
+
+    log("Enviando email via SMTP...", {
+      from: mailData.from,
+      to: mailData.to,
+      subject: mailData.subject,
     });
 
-    console.log(`\n✅ [MAGIC LINK] EMAIL ENVIADO COM SUCESSO!`);
-    console.log(`[MAGIC LINK] Message ID: ${info.messageId}`);
-    console.log(`[MAGIC LINK] Response: ${info.response}`);
-    console.log(`[MAGIC LINK] Para: ${to}\n`);
+    const info = await transporter.sendMail(mailData);
+
+    logSuccess("EMAIL ENVIADO COM SUCESSO!", {
+      messageId: info.messageId,
+      response: info.response,
+      para: to,
+    });
 
     return info;
   } catch (error) {
-    console.error(`\n❌ [MAGIC LINK] ERRO AO ENVIAR EMAIL`);
-    console.error(`[MAGIC LINK] Para: ${to}`);
-    console.error(`[MAGIC LINK] Erro:`, error);
-    throw new Error(`Falha ao enviar email: ${error instanceof Error ? error.message : String(error)}`);
+    logError("ERRO AO ENVIAR EMAIL", {
+      para: to,
+      erro: error instanceof Error ? error.message : String(error),
+    });
+    throw new Error(
+      `Falha ao enviar email: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 };
 
-
-
-<<<<<<< HEAD
-=======
-
->>>>>>> c292da79d736a108f4658f6cb9ad29197a99945e
 // ===================================
-// Enviar Workspace Invitation Email
+// ENVIAR WORKSPACE INVITATION EMAIL
 // ===================================
-
 export const sendWorkspaceInvitationEmail = async (
   to: string,
   subject: string,
   data: WorkspaceInvitationEmailProps,
 ) => {
-  const emailTemplate = await render(WorkspaceInvitationEmail({ ...data, to }));
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject,
-    html: emailTemplate,
-  });
+  log(`Iniciando envio de convite para: ${to}`);
+  
+  try {
+    const emailTemplate = await render(WorkspaceInvitationEmail({ ...data, to }));
+    log("✅ Template renderizado");
+
+    log("Preparando dados do email...");
+    const mailData = {
+      from: `"${process.env.SMTP_FROM_NAME || "Kaneo"}" <${process.env.SMTP_FROM}>`,
+      to: to.toLowerCase(),
+      replyTo: process.env.SMTP_FROM || "",
+      subject,
+      html: emailTemplate,
+      encoding: "base64",
+      headers: {
+        "X-Mailer": "Kaneo/2.0",
+        "X-Priority": "3 (Normal)",
+        "Importance": "Normal",
+        "X-MSMail-Priority": "Normal",
+        "Precedence": "bulk",
+      },
+    };
+
+    log("Enviando email via SMTP...", {
+      from: mailData.from,
+      to: mailData.to,
+      subject: mailData.subject,
+    });
+
+    const info = await transporter.sendMail(mailData);
+
+    logSuccess("EMAIL DE CONVITE ENVIADO COM SUCESSO!", {
+      messageId: info.messageId,
+      response: info.response,
+      para: to,
+    });
+
+    return info;
+  } catch (error) {
+    logError("ERRO AO ENVIAR EMAIL DE CONVITE", {
+      para: to,
+      erro: error instanceof Error ? error.message : String(error),
+    });
+    throw new Error(
+      `Falha ao enviar email de convite: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 };

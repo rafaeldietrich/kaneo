@@ -35,8 +35,6 @@ const isCrossSubdomain = (() => {
 })();
 
 export const auth = betterAuth({
-<<<<<<< HEAD
-<<<<<<< HEAD
   // baseURL: process.env.KANEO_API_URL || "http://kaneo-frontend:1337" || "https://tasks-api.facta.dietrichconsultoria.com.br/",
   //trustedOrigins: [process.env.KANEO_CLIENT_URL || "http://localhost:5173" || "https://tasks.facta.dietrichconsultoria.com.br/"],
   baseURL: apiUrl,
