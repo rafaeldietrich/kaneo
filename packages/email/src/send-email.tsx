@@ -27,23 +27,6 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
-  name: 'DietrichConsultoria', // essesncial para Hostgator funcionar default é localhost e aqui nao funciona!
-  logger: true, // Habilitar logging
-  debug: true,  // Habilitar debug
-});
-
-
-
-// Verificar conexão
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("[SMTP] ❌ Erro na verificação:", error);
-  } else {
-    console.log("[SMTP] ✅ Conexão verificada com sucesso!");
-  }
 });
 
 export const sendMagicLinkEmail = async (
@@ -65,27 +48,8 @@ export const sendMagicLinkEmail = async (
       subject,
       // text : "Por favor, utilize um cliente de email que suporte HTML para visualizar este conteúdo.",
       html: emailTemplate,
-      // CRÍTICO: Forçar Base64 ao invés de quoted-printable
-      encoding: "base64",      
-      headers: {
-        "X-Mailer": "Kaneo/2.0",
-        "X-Priority": "3 (Normal)",
-        "Importance": "Normal",
-        "X-MSMail-Priority": "Normal",
-        "Precedence": "bulk",
-      },
     });
-<<<<<<< HEAD
-
-    console.log(`\n✅ [MAGIC LINK] EMAIL ENVIADO COM SUCESSO!`);
-    console.log(`[MAGIC LINK] Message ID: ${info.messageId}`);
-    console.log(`[MAGIC LINK] Response: ${info.response}`);
-    console.log(`[MAGIC LINK] Para: ${to}\n`);
-
-    return info;
-=======
     console.log(`Infomações de email "${process.env.SMTP_HOST}", secure "${process.env.SMTP_SECURE}" e port "${process.env.SMTP_PORT}", user "${process.env.SMTP_USER}"`);
->>>>>>> b64a276 (a)
   } catch (error) {
     console.error(`\n❌ [MAGIC LINK] ERRO AO ENVIAR EMAIL`);
     console.error(`[MAGIC LINK] Para: ${to}`);
