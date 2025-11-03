@@ -49,21 +49,19 @@ transporter.verify((error, success) => {
 // ===================================
 // Enviar Magic Link Email
 // ===================================
+
 export const sendMagicLinkEmail = async (
   to: string,
   subject: string,
   data: MagicLinkEmailProps,
 ) => {
-  console.log(`\n[MAGIC LINK] Iniciando envio de email para: ${to}`);
-  console.log(`[MAGIC LINK] Assunto: ${subject}`);
+  console.log(`\n[MAGIC LINK] Iniciando envio para: ${to}`);
   
   try {
-    // Renderizar template
-    console.log("[MAGIC LINK] Renderizando template...");
     const emailTemplate = await render(MagicLinkEmail(data));
     console.log("[MAGIC LINK] ✅ Template renderizado");
 
-   // CORREÇÃO CRÍTICA: Usar UTF-8 sem encoding quoted-printable
+    // CORREÇÃO CRÍTICA: Usar UTF-8 sem encoding quoted-printable
     const mailData = {
       from: `"${process.env.SMTP_FROM_NAME || "Dietrich Consultoria"}" <${process.env.SMTP_FROM}>`,
       to: to.toLowerCase(), // Força lowercase
@@ -85,14 +83,9 @@ export const sendMagicLinkEmail = async (
       },
     };
 
-    console.log("[MAGIC LINK] Enviando email via SMTP...");
-    console.log(`[MAGIC LINK] De: ${mailData.from}`);
-    console.log(`[MAGIC LINK] Para: ${mailData.to}`);
-
-    // Enviar email
+    console.log("[MAGIC LINK] Enviando via SMTP...");
     const info = await transporter.sendMail(mailData);
 
-    // LOG DE SUCESSO (DEPOIS do envio)
     console.log(`\n✅ [MAGIC LINK] EMAIL ENVIADO COM SUCESSO!`);
     console.log(`[MAGIC LINK] Message ID: ${info.messageId}`);
     console.log(`[MAGIC LINK] Response: ${info.response}`);
@@ -103,8 +96,6 @@ export const sendMagicLinkEmail = async (
     console.error(`\n❌ [MAGIC LINK] ERRO AO ENVIAR EMAIL`);
     console.error(`[MAGIC LINK] Para: ${to}`);
     console.error(`[MAGIC LINK] Erro:`, error);
-    
-    // Re-lançar erro para Better Auth capturar
     throw new Error(`Falha ao enviar email: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
