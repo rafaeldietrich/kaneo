@@ -17,8 +17,8 @@ import { generateDemoName } from "./utils/generate-demo-name";
 
 config();
 
-const apiUrl = process.env.KANEO_API_URL || "http://localhost:1337";
-const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
+const apiUrl = process.env.KANEO_API_URL || "http://localhost:1337" || "https://tasks-api.facta.dietrichconsultoria.com.br/";
+const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173" || "https://tasks.facta.dietrichconsultoria.com.br/";
 const isHttps = apiUrl.startsWith("https://");
 const isCrossSubdomain = (() => {
   try {
