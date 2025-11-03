@@ -30,6 +30,7 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
+  name: 'DietrichConsultoria',
   logger: true, // Habilitar logging
   debug: true,  // Habilitar debug
 });
